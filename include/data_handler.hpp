@@ -36,6 +36,7 @@ public:
 
     uint32_t convert_to_little_endian(const unsigned char *bytes);
 
+    int get_class_counts();
     std::vector<data *> *get_training_data();
     std::vector<data *> *get_test_data();
     std::vector<data *> *get_validation_data();
