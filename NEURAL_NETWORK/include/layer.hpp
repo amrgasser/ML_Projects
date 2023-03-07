@@ -12,7 +12,7 @@ public:
     Layer(int, int);
     ~Layer();
 
-    int currentLayerSize;
+    int current_layer_size;
     std::vector<Neuron *> neurons;
     std::vector<double> layer_outputs;
 };

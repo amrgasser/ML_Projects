@@ -1,4 +1,5 @@
 #include "data_handler.hpp"
+#include <iostream>
 
 data_handler::data_handler()
 {
@@ -184,21 +185,26 @@ void data_handler::read_csv(std::string path, std::string delimiter)
     num_classes = 0;
     std::ifstream data_file(path.c_str());
     std::string line;
-
+    std::getline(data_file, line);
     while (std::getline(data_file, line))
     {
         if (line.length() == 0)
             continue;
         data *d = new data();
         d->set_feature_vector(new std::vector<double>());
-        size_t position = 0;
+        size_t position = line.find(",");
         std::string token; // value in between delimiter
 
-        while ((position = line.find(delimiter) != std::string::npos))
+        while ((position != std::string::npos))
         {
+            std::cout << position << std::endl;
             token = line.substr(0, position);
+
+            std::cout << "Token: " << token << std::endl;
+
             d->append_to_feature_vector(std::stod(token));
             line.erase(0, position + delimiter.length());
+            position = line.find(",");
         }
         if (classMap.find(line) != classMap.end())
         {
@@ -213,6 +219,45 @@ void data_handler::read_csv(std::string path, std::string delimiter)
         data_array->push_back(d);
     }
     feature_vector_size = data_array->at(0)->get_double_feature_vector()->size();
+    printf("Done with read csv\n");
+}
+void data_handler::normalize()
+{
+    std::vector<double> mins, maxs;
+    data *d = data_array->at(0);
+
+    for (auto val : *d->get_double_feature_vector())
+    {
+        mins.push_back(val);
+        maxs.push_back(val);
+    }
+
+    for (int i = 1; i < data_array->size(); i++)
+    {
+        d = data_array->at(i);
+        for (int j = 0; j < d->get_double_feature_vector()->size(); j++)
+        {
+            double val = (double)d->get_double_feature_vector()->at(j);
+            if (val < mins.at(j))
+                mins[j] = val;
+            if (val > maxs.at(j))
+                maxs[j] = val;
+        }
+    }
+
+    for (int i = 0; i < data_array->size(); i++)
+    {
+        data_array->at(i)->set_feature_vector(new std::vector<double>());
+        data_array->at(i)->set_class_vector(num_classes);
+        for (int j = 0; j < data_array->at(i)->get_double_feature_vector()->size(); j++)
+        {
+            if (maxs[j] - mins[j] == 0)
+                data_array->at(i)->append_to_feature_vector(0.0);
+            else
+                data_array->at(i)->append_to_feature_vector(
+                    (double)(data_array->at(i)->get_double_feature_vector()->at(j) - mins[j]) / (maxs[j] - mins[j]));
+        }
+    }
 }
 
 // int main()

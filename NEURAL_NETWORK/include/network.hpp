@@ -12,23 +12,24 @@
 class Network : public common_data
 {
 public:
+    Network(std::vector<int> spec, int, int, double);
+    ~Network();
+
     std::vector<Layer *> layers;
     double learning_rate;
     double test_performance;
 
-    Network(std::vector<int> spec, int, int, double).~Netowkr();
-
-    std::vector<double> fprop(data data);
-    double activate(std::vector<double>, std::vector<double>);
-    double transfer(double);
-    double transfer_derivative(double); // back prop
+    std::vector<double> fprop(data *data);
+    double activate(std::vector<double>, std::vector<double>); // dot product of both vectors
+    double transfer(double);                                   // sigmoid
+    double transfer_derivative(double);                        // back prop
 
     // back prop methods
     void bprop(data *data);
     void update_weights(data *data);
     int predict(data *data); // return ind of max value;
 
-    void traing(int); // num of iterations
+    void train(int); // num of iterations
     double test();
     void validate();
 };
